@@ -1,3 +1,5 @@
+import { MapMarker } from '@primeicons/react'
+
 const App = () => {
   const estiloSubtitulo = {
     color: "gray",
@@ -10,7 +12,10 @@ const App = () => {
 
   return (
     <>
-      <h1 className="titulo">RolêRadar</h1>
+      <h1 className="titulo">
+        <MapMarker size={32} />
+        RolêRadar
+      </h1>
 
       <p style={estiloSubtitulo}>
         Descubra o que existe perto de você
