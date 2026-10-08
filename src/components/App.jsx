@@ -1,6 +1,7 @@
 import Busca from './Busca'
 import MeuPonto from './MeuPonto'
 import ListaLugares from './ListaLugares'
+import MapaRadar from './MapaRadar'
 import React from 'react'
 import { MapMarker } from '@primeicons/react'
 import Cartao from './Cartao'
@@ -15,7 +16,10 @@ class App extends React.Component {
     longitude: null,
     horarioLocalizacao: null,
     mensagemDeErro: null,
-    lugares: null
+    lugares: null,
+    buscando: false,
+    erroBusca: null,
+    raioBuscado: null
   }
 
   obterLocalizacao = () => {
@@ -43,6 +47,13 @@ class App extends React.Component {
 
   onBuscaRealizada = (categoria, raio) => {
     const { latitude, longitude } = this.state
+
+    this.setState({
+      buscando: true,
+      erroBusca: null,
+      raioBuscado: raio
+    })
+
     geoapifyClient.get('/places', {
       params: {
         categories: categoria,
@@ -52,8 +63,26 @@ class App extends React.Component {
       }
     })
     .then((result) => {
-      this.setState({ lugares: result.data.features })
+      this.setState({
+        lugares: result.data.features,
+        buscando: false
+      })
     })
+    .catch((erro) => {
+      console.log(erro)
+      this.setState({
+        buscando: false,
+        erroBusca: 'Não foi possível consultar os lugares. Tente novamente.'
+      })
+    })
+  }
+
+  obterResumo = () => {
+    const quantidade = this.state.lugares.length
+    if (quantidade === 1) {
+      return `1 lugar encontrado em até ${this.state.raioBuscado} m`
+    }
+    return `${quantidade} lugares encontrados em até ${this.state.raioBuscado} m`
   }
 
   obterAno = () => {
@@ -114,13 +143,30 @@ class App extends React.Component {
 
         <div className="col-6">
           {
+            this.state.buscando ?
+              <Loading mensagem="Procurando lugares..." />
+            :
+            this.state.erroBusca ?
+              <p>{this.state.erroBusca}</p>
+            :
             this.state.lugares === null ?
               null
             :
             this.state.lugares.length === 0 ?
               <p>Nenhum lugar encontrado. Tente aumentar o raio.</p>
             :
-              <ListaLugares lugares={this.state.lugares} />
+              <div>
+                <p><strong>{this.obterResumo()}</strong></p>
+                <Cartao cabecalho="Radar">
+                  <MapaRadar
+                    latitude={this.state.latitude}
+                    longitude={this.state.longitude}
+                    lugares={this.state.lugares} />
+                </Cartao>
+                <div className="mt-3">
+                  <ListaLugares lugares={this.state.lugares} />
+                </div>
+              </div>
           }
         </div>
 
