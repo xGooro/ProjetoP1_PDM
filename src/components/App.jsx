@@ -1,7 +1,7 @@
+import Busca from './Busca'
 import MeuPonto from './MeuPonto'
 import React from 'react'
 import { MapMarker } from '@primeicons/react'
-import { Button } from '@primereact/ui/button'
 import Cartao from './Cartao'
 import Creditos from './Creditos'
 import Loading from './Loading'
@@ -100,11 +100,11 @@ class App extends React.Component {
                   horarioLocalizacao={this.state.horarioLocalizacao}
                   onAtualizar={this.obterLocalizacao} />
               </Cartao>
-              <Button
-                className="mt-3"
-                onClick={() => this.onBuscaRealizada('catering.cafe', 1000)}>
-                Testar busca
-              </Button>
+              <div className="mt-3">
+                <Cartao cabecalho="O que você procura?">
+                  <Busca onBuscaRealizada={this.onBuscaRealizada} />
+                </Cartao>
+              </div>
             </div>
         }
 
