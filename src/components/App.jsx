@@ -1,5 +1,6 @@
 import Busca from './Busca'
 import MeuPonto from './MeuPonto'
+import ListaLugares from './ListaLugares'
 import React from 'react'
 import { MapMarker } from '@primeicons/react'
 import Cartao from './Cartao'
@@ -13,7 +14,8 @@ class App extends React.Component {
     latitude: null,
     longitude: null,
     horarioLocalizacao: null,
-    mensagemDeErro: null
+    mensagemDeErro: null,
+    lugares: null
   }
 
   obterLocalizacao = () => {
@@ -50,7 +52,7 @@ class App extends React.Component {
       }
     })
     .then((result) => {
-      console.log(result.data.features)
+      this.setState({ lugares: result.data.features })
     })
   }
 
@@ -66,9 +68,9 @@ class App extends React.Component {
     }
 
     return (
-      <div className="flex flex-column align-items-center p-3">
+      <div className="grid p-3">
 
-        <div className="flex flex-column align-items-center gap-1">
+        <div className="col-12 flex flex-column align-items-center gap-1">
 
           <div className="flex align-items-center gap-2">
             <MapMarker size={32} />
@@ -85,30 +87,44 @@ class App extends React.Component {
 
         </div>
 
-        {
-          this.state.mensagemDeErro ?
-            <p>{this.state.mensagemDeErro}</p>
-          :
-          this.state.latitude === null ?
-            <Loading mensagem="Aguardando permissão de localização..." />
-          :
-            <div>
-              <Cartao cabecalho="Você está aqui">
-                <MeuPonto
-                  latitude={this.state.latitude}
-                  longitude={this.state.longitude}
-                  horarioLocalizacao={this.state.horarioLocalizacao}
-                  onAtualizar={this.obterLocalizacao} />
-              </Cartao>
-              <div className="mt-3">
-                <Cartao cabecalho="O que você procura?">
-                  <Busca onBuscaRealizada={this.onBuscaRealizada} />
+        <div className="col-6">
+          {
+            this.state.mensagemDeErro ?
+              <p>{this.state.mensagemDeErro}</p>
+            :
+            this.state.latitude === null ?
+              <Loading mensagem="Aguardando permissão de localização..." />
+            :
+              <div>
+                <Cartao cabecalho="Você está aqui">
+                  <MeuPonto
+                    latitude={this.state.latitude}
+                    longitude={this.state.longitude}
+                    horarioLocalizacao={this.state.horarioLocalizacao}
+                    onAtualizar={this.obterLocalizacao} />
                 </Cartao>
+                <div className="mt-3">
+                  <Cartao cabecalho="O que você procura?">
+                    <Busca onBuscaRealizada={this.onBuscaRealizada} />
+                  </Cartao>
+                </div>
               </div>
-            </div>
-        }
+          }
+        </div>
 
-        <div className="rodape">
+        <div className="col-6">
+          {
+            this.state.lugares === null ?
+              null
+            :
+            this.state.lugares.length === 0 ?
+              <p>Nenhum lugar encontrado. Tente aumentar o raio.</p>
+            :
+              <ListaLugares lugares={this.state.lugares} />
+          }
+        </div>
+
+        <div className="col-12 text-center rodape">
           <p>RolêRadar © {this.obterAno()}</p>
         </div>
 
