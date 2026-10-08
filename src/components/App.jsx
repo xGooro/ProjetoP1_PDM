@@ -1,3 +1,4 @@
+import MeuPonto from './MeuPonto'
 import React from 'react'
 import { MapMarker } from '@primeicons/react'
 import Cartao from './Cartao'
@@ -74,7 +75,13 @@ class App extends React.Component {
           this.state.latitude === null ?
             <Loading mensagem="Aguardando permissão de localização..." />
           :
-            <p>Localização obtida: {this.state.latitude}, {this.state.longitude}</p>
+            <Cartao cabecalho="Você está aqui">
+              <MeuPonto
+                latitude={this.state.latitude}
+                longitude={this.state.longitude}
+                horarioLocalizacao={this.state.horarioLocalizacao}
+                onAtualizar={this.obterLocalizacao} />
+            </Cartao>
         }
 
         <div className="rodape">
