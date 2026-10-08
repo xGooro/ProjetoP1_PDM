@@ -1,50 +1,89 @@
+import React from 'react'
 import { MapMarker } from '@primeicons/react'
 import Cartao from './Cartao'
 import Creditos from './Creditos'
+import Loading from './Loading'
 
-const estiloSubtitulo = {
-  color: "gray",
-  fontSize: "18px",
-  margin: 0
-}
+class App extends React.Component {
 
-const obterAno = () => {
-  return new Date().getFullYear()
-}
+  state = {
+    latitude: null,
+    longitude: null,
+    horarioLocalizacao: null,
+    mensagemDeErro: null
+  }
 
-const App = () => {
-  return (
-    <div className="flex flex-column align-items-center p-3">
+  obterLocalizacao = () => {
+    window.navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.setState({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          horarioLocalizacao: Date.now(),
+          mensagemDeErro: null
+        })
+      },
+      (erro) => {
+        console.log(erro)
+        this.setState({
+          mensagemDeErro: 'Não foi possível obter sua localização. Libere o acesso no navegador e atualize a página.'
+        })
+      }
+    )
+  }
 
-      <div className="flex flex-column align-items-center gap-1">
+  componentDidMount() {
+    this.obterLocalizacao()
+  }
 
-        <div className="flex align-items-center gap-2">
-          <MapMarker size={32} />
-          <h1 className="titulo">RolêRadar</h1>
+  obterAno = () => {
+    return new Date().getFullYear()
+  }
+
+  render() {
+    const estiloSubtitulo = {
+      color: "gray",
+      fontSize: "18px",
+      margin: 0
+    }
+
+    return (
+      <div className="flex flex-column align-items-center p-3">
+
+        <div className="flex flex-column align-items-center gap-1">
+
+          <div className="flex align-items-center gap-2">
+            <MapMarker size={32} />
+            <h1 className="titulo">RolêRadar</h1>
+          </div>
+
+          <div className="flex align-items-center">
+            <p style={estiloSubtitulo}>
+              Descubra o que existe perto de você
+            </p>
+          </div>
+
+          <Creditos />
+
         </div>
 
-        <div className="flex align-items-center">
-          <p style={estiloSubtitulo}>
-            Descubra o que existe perto de você
-          </p>
+        {
+          this.state.mensagemDeErro ?
+            <p>{this.state.mensagemDeErro}</p>
+          :
+          this.state.latitude === null ?
+            <Loading mensagem="Aguardando permissão de localização..." />
+          :
+            <p>Localização obtida: {this.state.latitude}, {this.state.longitude}</p>
+        }
+
+        <div className="rodape">
+          <p>RolêRadar © {this.obterAno()}</p>
         </div>
 
-        <Creditos />
-
       </div>
-
-      <div className="m-4">
-        <Cartao cabecalho="Teste do cartão">
-          <p>Conteúdo do cartão</p>
-        </Cartao>
-      </div>
-
-      <div className="rodape">
-        <p>RolêRadar © {obterAno()}</p>
-      </div>
-
-    </div>
-  )
+    )
+  }
 }
 
 export default App
